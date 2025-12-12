@@ -9,7 +9,6 @@ const Navbar = () => {
         <nav className="glass-panel" style={{ padding: '15px 30px', margin: '20px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <h2 style={{ margin: 0, fontWeight: 'bold' }}>CampusConnect</h2>
-                <span style={{ fontSize: '0.8em', opacity: 0.8 }}>({user.role})</span>
             </div>
             <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
                 <Link to="/" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '5px' }}>

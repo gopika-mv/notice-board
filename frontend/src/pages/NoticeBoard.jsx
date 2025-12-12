@@ -5,7 +5,7 @@ import { Search, Filter, Calendar } from 'lucide-react';
 const NoticeBoard = () => {
     const [notices, setNotices] = useState([]);
     const [search, setSearch] = useState('');
-    const [filters, setFilters] = useState({ department_id: '', priority: '', date: '' });
+    const [filters, setFilters] = useState({ department_id: '', is_urgent: '', date: '' });
     const [departments, setDepartments] = useState([]);
 
     useEffect(() => {
@@ -36,7 +36,7 @@ const NoticeBoard = () => {
             const cleanParams = {};
             if (search) cleanParams.search = search;
             if (filters.department_id) cleanParams.department_id = filters.department_id;
-            if (filters.priority) cleanParams.priority = filters.priority;
+            if (filters.is_urgent) cleanParams.is_urgent = filters.is_urgent;
             if (filters.date) cleanParams.date = filters.date;
 
             const { data } = await api.get('/notices', { params: cleanParams });
@@ -46,14 +46,8 @@ const NoticeBoard = () => {
         }
     };
 
-    const getPriorityColor = (p) => {
-        switch (p) {
-            case 'urgent': return '#ff4757';
-            case 'high': return '#ffa502';
-            case 'normal': return '#2ed573';
-            case 'low': return '#1e90ff';
-            default: return 'white';
-        }
+    const getPriorityColor = (isUrgent) => {
+        return isUrgent ? '#ff4757' : '#2ed573';
     };
 
     return (
@@ -84,15 +78,13 @@ const NoticeBoard = () => {
                     </select>
 
                     <select
-                        value={filters.priority}
-                        onChange={(e) => setFilters({ ...filters, priority: e.target.value })}
+                        value={filters.is_urgent}
+                        onChange={(e) => setFilters({ ...filters, is_urgent: e.target.value })}
                         style={{ margin: 0, width: '120px' }}
                     >
                         <option value="" style={{ color: 'black' }}>All Priorities</option>
-                        <option value="urgent" style={{ color: 'black' }}>Urgent</option>
-                        <option value="high" style={{ color: 'black' }}>High</option>
-                        <option value="normal" style={{ color: 'black' }}>Normal</option>
-                        <option value="low" style={{ color: 'black' }}>Low</option>
+                        <option value="true" style={{ color: 'black' }}>Urgent</option>
+                        <option value="false" style={{ color: 'black' }}>Normal</option>
                     </select>
 
 
@@ -104,13 +96,13 @@ const NoticeBoard = () => {
                     <div key={notice.id} className="glass-panel" style={{ padding: '20px', display: 'flex', flexDirection: 'column' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '10px' }}>
                             <span style={{
-                                background: getPriorityColor(notice.priority),
+                                background: getPriorityColor(notice.is_urgent),
                                 padding: '2px 8px',
                                 borderRadius: '4px',
                                 fontSize: '0.7em',
                                 fontWeight: 'bold'
                             }}>
-                                {notice.priority.toUpperCase()}
+                                {notice.is_urgent ? 'URGENT' : 'NORMAL'}
                             </span>
 
                         </div>

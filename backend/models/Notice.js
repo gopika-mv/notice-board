@@ -19,9 +19,9 @@ const Notice = sequelize.define('Notice', {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW,
     },
-    priority: {
-        type: DataTypes.ENUM('low', 'normal', 'high', 'urgent'),
-        defaultValue: 'normal',
+    is_urgent: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
     },
     status: {
         type: DataTypes.ENUM('pending', 'approved', 'rejected'),

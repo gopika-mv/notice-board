@@ -3,12 +3,12 @@ const { Op } = require('sequelize');
 
 const createNotice = async (req, res) => {
     try {
-        const { title, content, priority } = req.body;
+        const { title, content, is_urgent } = req.body;
         // Department is auto-assigned from Staff's department
         const notice = await Notice.create({
             title,
             content,
-            priority,
+            is_urgent,
             department_id: req.departmentId,
             author_id: req.userId,
             status: 'pending'
@@ -21,7 +21,7 @@ const createNotice = async (req, res) => {
 
 const getNotices = async (req, res) => {
     try {
-        const { search, department_id, date, priority } = req.query;
+        const { search, department_id, date, is_urgent } = req.query;
         const { role, userId } = req;
 
         let whereClause = {};
@@ -30,29 +30,17 @@ const getNotices = async (req, res) => {
         if (role === 'student') {
             whereClause.status = 'approved';
         } else if (role === 'staff') {
-            // Staff sees approved notices OR their own pending notices? 
-            // Usually they want to see what they posted.
-            // Let's allow Staff to see ALL approved notices + their OWN pending/rejected notices.
-            // For simplicity, let's just show 'approved' for feed, and a separate endpoint for 'my notices' or handle here.
-            // User requested: "if it approved then it can seee by students".
-            // Let's stick to: Students/Public -> Approved.
-            // Admin -> All (including pending).
-            // Staff -> Approved (like students) + Own created?
-            // Let's make this endpoint generic "Feed" -> Approved only unless Admin.
-            // Wait, Admin needs to see Pending to approve them.
             if (role !== 'admin') {
                 whereClause.status = 'approved';
             }
         }
-        // If Admin, no status filter by default (shows all), unless specified in query? 
-        // Admin approval panel likely needs 'pending' only.
 
         // Filters
         if (department_id) whereClause.department_id = department_id;
-        if (priority) whereClause.priority = priority;
+        if (is_urgent !== undefined && is_urgent !== '') {
+            whereClause.is_urgent = is_urgent === 'true';
+        }
         if (date) {
-            // Simple date match (exact day) - tricky with timestamps.
-            // Let's assume date is YYYY-MM-DD
             const startOfDay = new Date(date);
             const endOfDay = new Date(date);
             endOfDay.setHours(23, 59, 59, 999);

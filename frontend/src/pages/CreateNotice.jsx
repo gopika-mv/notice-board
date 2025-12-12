@@ -27,8 +27,10 @@ const CreateNotice = () => {
         setLoading(true);
         try {
             const payload = {
-                ...formData,
-                priority: isUrgent ? 'urgent' : 'normal'
+                title: formData.title,
+                content: formData.content,
+                department_id: formData.department_id,
+                is_urgent: isUrgent
             };
             await api.post('/notices', payload);
             alert('Notice posted! Waiting for admin approval.');
