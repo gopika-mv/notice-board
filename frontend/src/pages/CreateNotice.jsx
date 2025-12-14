@@ -4,23 +4,9 @@ import api from '../api';
 
 const CreateNotice = () => {
     const navigate = useNavigate();
-    const [formData, setFormData] = useState({ title: '', content: '', priority: 'normal', department_id: '' });
-    const [departments, setDepartments] = useState([]);
+    const [formData, setFormData] = useState({ title: '', content: '', priority: 'normal' });
     const [loading, setLoading] = useState(false);
     const [isUrgent, setIsUrgent] = useState(false);
-
-    // Fetch departments on mount
-    useState(() => {
-        const fetchDepts = async () => {
-            try {
-                const { data } = await api.get('/departments');
-                setDepartments(data);
-            } catch (error) {
-                console.error('Failed to load departments');
-            }
-        };
-        fetchDepts();
-    }, []);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -29,7 +15,6 @@ const CreateNotice = () => {
             const payload = {
                 title: formData.title,
                 content: formData.content,
-                department_id: formData.department_id,
                 is_urgent: isUrgent
             };
             await api.post('/notices', payload);
@@ -68,20 +53,6 @@ const CreateNotice = () => {
                             rows="4"
                             style={{ background: '#2d2d2d', borderColor: '#404040', padding: '15px', fontFamily: 'inherit' }}
                         ></textarea>
-                    </div>
-
-                    <div style={{ marginBottom: '20px' }}>
-                        <select
-                            value={formData.department_id}
-                            onChange={(e) => setFormData({ ...formData, department_id: e.target.value })}
-                            style={{ background: '#2d2d2d', borderColor: '#404040', padding: '15px' }}
-                            required
-                        >
-                            <option value="">Select Department</option>
-                            {departments.map(d => (
-                                <option key={d.id} value={d.id}>{d.name}</option>
-                            ))}
-                        </select>
                     </div>
 
                     <div style={{ marginBottom: '25px', display: 'flex', alignItems: 'center', gap: '10px' }}>

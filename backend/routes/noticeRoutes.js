@@ -1,5 +1,5 @@
 const express = require('express');
-const { createNotice, getNotices, getPendingNotices, updateNoticeStatus } = require('../controllers/noticeController');
+const { createNotice, getNotices, getPendingNotices, updateNoticeStatus, getApprovedNotices, getMyNotices } = require('../controllers/noticeController');
 const { verifyToken, verifyRole } = require('../middleware/authMiddleware');
 const router = express.Router();
 
@@ -9,9 +9,11 @@ router.get('/', verifyToken, getNotices);
 
 // Staff Routes
 router.post('/', verifyToken, verifyRole(['staff']), createNotice);
+router.get('/my', verifyToken, verifyRole(['staff']), getMyNotices);
 
 // Admin Routes
 router.get('/pending', verifyToken, verifyRole(['admin']), getPendingNotices);
+router.get('/approved', verifyToken, verifyRole(['admin']), getApprovedNotices);
 router.put('/:id/status', verifyToken, verifyRole(['admin']), updateNoticeStatus);
 
 module.exports = router;

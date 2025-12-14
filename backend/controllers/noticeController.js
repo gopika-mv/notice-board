@@ -26,14 +26,8 @@ const getNotices = async (req, res) => {
 
         let whereClause = {};
 
-        // Role-based visibility
-        if (role === 'student') {
-            whereClause.status = 'approved';
-        } else if (role === 'staff') {
-            if (role !== 'admin') {
-                whereClause.status = 'approved';
-            }
-        }
+        // Always filter by approved status for the main feed
+        whereClause.status = 'approved';
 
         // Filters
         if (department_id) whereClause.department_id = department_id;
@@ -74,7 +68,8 @@ const getPendingNotices = async (req, res) => {
             where: { status: 'pending' },
             include: [
                 { model: User, as: 'author', attributes: ['username'] },
-                { model: Department, attributes: ['name'] }
+                { model: Department, attributes: ['name'] },
+                { model: User, as: 'approver', attributes: ['username'] }
             ],
             order: [['date', 'ASC']]
         });
@@ -97,6 +92,8 @@ const updateNoticeStatus = async (req, res) => {
         if (!notice) return res.status(404).json({ message: 'Notice not found' });
 
         notice.status = status;
+        notice.approved_by = req.userId; // Store the admin who performed the action
+        notice.approved_at = new Date(); // Store the timestamp
         await notice.save();
 
         res.json({ message: `Notice ${status}`, notice });
@@ -105,4 +102,44 @@ const updateNoticeStatus = async (req, res) => {
     }
 };
 
-module.exports = { createNotice, getNotices, getPendingNotices, updateNoticeStatus };
+const getApprovedNotices = async (req, res) => {
+    // For Staff Approval page - shows approved/rejected notices with admin info
+    try {
+        const notices = await Notice.findAll({
+            where: {
+                status: { [Op.in]: ['approved', 'rejected'] }
+            },
+            include: [
+                { model: User, as: 'author', attributes: ['username'] },
+                { model: Department, attributes: ['name'] },
+                { model: User, as: 'approver', attributes: ['username'] }
+            ],
+            order: [['approved_at', 'DESC']]
+        });
+        res.json(notices);
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching approved notices', error });
+    }
+};
+
+const getMyNotices = async (req, res) => {
+    // For Staff to view their own notices with all statuses
+    try {
+        const notices = await Notice.findAll({
+            where: {
+                author_id: req.userId
+            },
+            include: [
+                { model: User, as: 'author', attributes: ['username'] },
+                { model: Department, attributes: ['name'] },
+                { model: User, as: 'approver', attributes: ['username'] }
+            ],
+            order: [['date', 'DESC']]
+        });
+        res.json(notices);
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching my notices', error });
+    }
+};
+
+module.exports = { createNotice, getNotices, getPendingNotices, updateNoticeStatus, getApprovedNotices, getMyNotices };

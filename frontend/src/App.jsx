@@ -4,6 +4,7 @@ import Login from './pages/Login';
 import NoticeBoard from './pages/NoticeBoard';
 import AdminPanel from './pages/AdminPanel';
 import CreateNotice from './pages/CreateNotice';
+import MyNotices from './pages/MyNotices';
 import Navbar from './components/Navbar';
 
 function App() {
@@ -24,8 +25,19 @@ function App() {
                             : <Navigate to="/" />
                     } />
 
+                    <Route path="/my-notices" element={
+                        user && user.role === 'staff'
+                            ? <MyNotices />
+                            : <Navigate to="/" />
+                    } />
+
                     <Route path="/admin" element={<Navigate to="/admin/approvals" />} />
                     <Route path="/admin/approvals" element={
+                        user && user.role === 'admin'
+                            ? <AdminPanel />
+                            : <Navigate to="/" />
+                    } />
+                    <Route path="/admin/staff-approval" element={
                         user && user.role === 'admin'
                             ? <AdminPanel />
                             : <Navigate to="/" />

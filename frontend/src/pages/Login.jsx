@@ -1,20 +1,39 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import api from '../api';
 
 const Login = () => {
     const { login } = useAuth();
     const [isRegister, setIsRegister] = useState(false);
-    const [formData, setFormData] = useState({ username: '', password: '', role: 'student', departmentName: '' });
+    const [formData, setFormData] = useState({ username: '', password: '', role: 'student', department_id: '' });
     const [error, setError] = useState('');
+    const [departments, setDepartments] = useState([]);
+
+    useEffect(() => {
+        if (isRegister) {
+            fetchDepartments();
+        }
+    }, [isRegister]);
+
+    const fetchDepartments = async () => {
+        try {
+            const { data } = await api.get('/departments');
+            setDepartments(data);
+        } catch (error) {
+            console.error('Error fetching departments', error);
+        }
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
         try {
             if (isRegister) {
-                await api.post('/auth/register', formData);
-                alert('Registration successful! Please login.');
+                const response = await api.post('/auth/register', formData);
+                const message = formData.role === 'staff'
+                    ? 'Registration successful! Waiting for admin approval.'
+                    : 'Registration successful! Please login.';
+                alert(message);
                 setIsRegister(false);
             } else {
                 await login(formData.username, formData.password);
@@ -54,15 +73,21 @@ const Login = () => {
                             >
                                 <option value="student" style={{ color: 'black' }}>Student</option>
                                 <option value="staff" style={{ color: 'black' }}>Staff</option>
-                                <option value="admin" style={{ color: 'black' }}>Admin</option>
+
                             </select>
                             {(formData.role === 'staff' || formData.role === 'student') && (
-                                <input
-                                    type="text"
-                                    placeholder="Department (e.g. CS)"
-                                    value={formData.departmentName}
-                                    onChange={(e) => setFormData({ ...formData, departmentName: e.target.value })}
-                                />
+                                <select
+                                    value={formData.department_id}
+                                    onChange={(e) => setFormData({ ...formData, department_id: e.target.value })}
+                                    required
+                                >
+                                    <option value="" style={{ color: 'black' }}>Select Department</option>
+                                    {departments.map(dept => (
+                                        <option key={dept.id} value={dept.id} style={{ color: 'black' }}>
+                                            {dept.name}
+                                        </option>
+                                    ))}
+                                </select>
                             )}
                         </>
                     )}

@@ -35,6 +35,18 @@ const Notice = sequelize.define('Notice', {
         type: DataTypes.INTEGER,
         allowNull: false,
     },
+    approved_by: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        references: {
+            model: 'Users',
+            key: 'id'
+        }
+    },
+    approved_at: {
+        type: DataTypes.DATE,
+        allowNull: true,
+    },
 });
 
 module.exports = Notice;

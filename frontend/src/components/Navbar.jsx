@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { LogOut, PlusCircle, CheckSquare, Home } from 'lucide-react';
+import { LogOut, PlusCircle, CheckSquare, Home, FileText } from 'lucide-react';
 
 const Navbar = () => {
     const { user, logout } = useAuth();
@@ -16,15 +16,23 @@ const Navbar = () => {
                 </Link>
 
                 {(user.role === 'staff') && (
-                    <Link to="/create" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                        <PlusCircle size={18} /> Post Notice
-                    </Link>
+                    <>
+                        <Link to="/create" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                            <PlusCircle size={18} /> Post Notice
+                        </Link>
+                        <Link to="/my-notices" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                            <FileText size={18} /> My Notices
+                        </Link>
+                    </>
                 )}
 
                 {user.role === 'admin' && (
                     <>
                         <Link to="/admin/approvals" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                            <CheckSquare size={18} /> Approvals
+                            <CheckSquare size={18} /> Notice Approval
+                        </Link>
+                        <Link to="/admin/staff-approval" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                            <CheckSquare size={18} /> Staff Approval
                         </Link>
                         <Link to="/admin/departments" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '5px' }}>
                             <PlusCircle size={18} /> Add Department

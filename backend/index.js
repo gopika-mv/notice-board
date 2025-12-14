@@ -20,10 +20,12 @@ syncDatabase();
 const authRoutes = require('./routes/authRoutes');
 const noticeRoutes = require('./routes/noticeRoutes');
 const deptRoutes = require('./routes/deptRoutes');
+const staffRoutes = require('./routes/staffRoutes');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/notices', noticeRoutes);
 app.use('/api/departments', deptRoutes);
+app.use('/api/staff', staffRoutes);
 
 
 app.get('/', (req, res) => {

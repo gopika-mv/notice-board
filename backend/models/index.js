@@ -13,6 +13,9 @@ Department.hasMany(Notice, { foreignKey: 'department_id' });
 Notice.belongsTo(User, { as: 'author', foreignKey: 'author_id' });
 User.hasMany(Notice, { foreignKey: 'author_id' });
 
+Notice.belongsTo(User, { as: 'approver', foreignKey: 'approved_by' });
+User.hasMany(Notice, { as: 'approvedNotices', foreignKey: 'approved_by' });
+
 const syncDatabase = async () => {
     try {
         await sequelize.authenticate();

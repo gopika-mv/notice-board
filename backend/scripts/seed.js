@@ -29,9 +29,9 @@ const seed = async () => {
         console.log('Department ensure: Computer Science');
 
         const users = [
-            { username: 'admin', password: 'admin123', role: 'admin', department_id: null },
-            { username: 'staff', password: 'staff123', role: 'staff', department_id: csDept.id },
-            { username: 'student', password: 'student123', role: 'student', department_id: csDept.id }
+            { username: 'admin', password: 'admin123', role: 'admin', department_id: null, approval_status: 'approved' },
+            { username: 'staff', password: 'staff123', role: 'staff', department_id: csDept.id, approval_status: 'approved' },
+            { username: 'student', password: 'student123', role: 'student', department_id: csDept.id, approval_status: 'approved' }
         ];
 
         for (const u of users) {
@@ -42,7 +42,8 @@ const seed = async () => {
                     username: u.username,
                     password: hashedPassword,
                     role: u.role,
-                    department_id: u.department_id
+                    department_id: u.department_id,
+                    approval_status: u.approval_status
                 });
                 console.log(`Created user: ${u.username}`);
             } else {
