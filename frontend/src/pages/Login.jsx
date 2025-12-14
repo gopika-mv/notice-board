@@ -5,7 +5,7 @@ import api from '../api';
 const Login = () => {
     const { login } = useAuth();
     const [isRegister, setIsRegister] = useState(false);
-    const [formData, setFormData] = useState({ username: '', password: '', role: 'student', department_id: '' });
+    const [formData, setFormData] = useState({ name: '', username: '', password: '', role: 'student', department_id: '' }); // added name
     const [error, setError] = useState('');
     const [departments, setDepartments] = useState([]);
 
@@ -50,6 +50,15 @@ const Login = () => {
                 {error && <div style={{ background: 'rgba(255,0,0,0.2)', padding: '10px', borderRadius: '5px', marginBottom: '10px' }}>{error}</div>}
 
                 <form onSubmit={handleSubmit}>
+                    {isRegister && (
+                        <input
+                            type="text"
+                            placeholder="Full Name"
+                            value={formData.name}
+                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                            required
+                        />
+                    )}
                     <input
                         type="text"
                         placeholder="Username"
@@ -73,7 +82,6 @@ const Login = () => {
                             >
                                 <option value="student" style={{ color: 'black' }}>Student</option>
                                 <option value="staff" style={{ color: 'black' }}>Staff</option>
-
                             </select>
                             {(formData.role === 'staff' || formData.role === 'student') && (
                                 <select

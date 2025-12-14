@@ -50,7 +50,7 @@ const getNotices = async (req, res) => {
         const notices = await Notice.findAll({
             where: whereClause,
             include: [
-                { model: User, as: 'author', attributes: ['username'] },
+                { model: User, as: 'author', attributes: ['username', 'name'] },
                 { model: Department, attributes: ['name'] }
             ],
             order: [['date', 'DESC']]
@@ -67,7 +67,7 @@ const getPendingNotices = async (req, res) => {
         const notices = await Notice.findAll({
             where: { status: 'pending' },
             include: [
-                { model: User, as: 'author', attributes: ['username'] },
+                { model: User, as: 'author', attributes: ['username', 'name'] },
                 { model: Department, attributes: ['name'] },
                 { model: User, as: 'approver', attributes: ['username'] }
             ],
@@ -110,7 +110,7 @@ const getApprovedNotices = async (req, res) => {
                 status: { [Op.in]: ['approved', 'rejected'] }
             },
             include: [
-                { model: User, as: 'author', attributes: ['username'] },
+                { model: User, as: 'author', attributes: ['username', 'name'] },
                 { model: Department, attributes: ['name'] },
                 { model: User, as: 'approver', attributes: ['username'] }
             ],
@@ -130,7 +130,7 @@ const getMyNotices = async (req, res) => {
                 author_id: req.userId
             },
             include: [
-                { model: User, as: 'author', attributes: ['username'] },
+                { model: User, as: 'author', attributes: ['username', 'name'] },
                 { model: Department, attributes: ['name'] },
                 { model: User, as: 'approver', attributes: ['username'] }
             ],

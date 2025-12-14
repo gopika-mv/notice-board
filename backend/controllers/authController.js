@@ -28,7 +28,7 @@ const login = async (req, res) => {
             { expiresIn: '24h' }
         );
 
-        res.json({ token, user: { id: user.id, username: user.username, role: user.role, department_id: user.department_id } });
+        res.json({ token, user: { id: user.id, username: user.username, name: user.name, role: user.role, department_id: user.department_id } });
     } catch (error) {
         res.status(500).json({ message: 'Server error', error });
     }
@@ -37,7 +37,7 @@ const login = async (req, res) => {
 // Start: Seed helper (dev only)
 const register = async (req, res) => {
     try {
-        const { username, password, role, department_id } = req.body;
+        const { username, password, name, role, department_id } = req.body; // added name
         const hashedPassword = await bcrypt.hash(password, 10);
 
         // Staff users need admin approval, others are auto-approved
@@ -46,6 +46,7 @@ const register = async (req, res) => {
         const user = await User.create({
             username,
             password: hashedPassword,
+            name, // added name
             role,
             department_id,
             approval_status

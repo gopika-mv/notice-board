@@ -111,7 +111,7 @@ const NoticeBoard = () => {
 
                         <div style={{ marginTop: '15px', paddingTop: '15px', borderTop: '1px solid rgba(255,255,255,0.1)', fontSize: '0.8em', display: 'flex', justifyContent: 'space-between' }}>
                             <span>Dept: {notice.Department?.name || 'General'}</span>
-                            <span>By: {notice.author?.username}</span>
+                            <span>By: {notice.author?.name}</span>
                         </div>
                     </div>
                 ))}

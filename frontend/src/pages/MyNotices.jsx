@@ -73,7 +73,7 @@ const MyNotices = () => {
                                     <div>Posted: {new Date(notice.date).toLocaleString()}</div>
                                     {notice.approver && (
                                         <div>
-                                            {notice.status === 'approved' ? 'Approved' : 'Rejected'} by: {notice.approver.username} on {new Date(notice.approved_at).toLocaleString()}
+                                            {notice.status === 'approved' ? 'Approved' : 'Rejected'} by: {notice.approver?.name} on {new Date(notice.approved_at).toLocaleString()}
                                         </div>
                                     )}
                                 </div>
