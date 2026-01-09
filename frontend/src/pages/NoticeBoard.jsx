@@ -1,11 +1,14 @@
 import { useState, useEffect } from 'react';
 import api from '../api';
-import { Search, Filter, Calendar } from 'lucide-react';
+import { Search, Filter } from 'lucide-react';
 
 const NoticeBoard = () => {
     const [notices, setNotices] = useState([]);
     const [search, setSearch] = useState('');
-    const [filters, setFilters] = useState({ department_id: '', is_urgent: '', date: '' });
+    const [filters, setFilters] = useState({
+        department_id: '',
+        is_urgent: ''
+    });
     const [departments, setDepartments] = useState([]);
 
     useEffect(() => {
@@ -14,11 +17,9 @@ const NoticeBoard = () => {
     }, []);
 
     useEffect(() => {
-        const delayDebounceFn = setTimeout(() => {
-            fetchNotices();
-        }, 500);
-        return () => clearTimeout(delayDebounceFn);
-    }, [search, filters]);
+        const delay = setTimeout(fetchNotices, 500);
+        return () => clearTimeout(delay);
+    }, [search, filters.department_id, filters.is_urgent]);
 
     const fetchDepartments = async () => {
         try {
@@ -31,13 +32,13 @@ const NoticeBoard = () => {
 
     const fetchNotices = async () => {
         try {
-            const query = new URLSearchParams({ search, ...filters }).toString();
-            // Filter out empty params
             const cleanParams = {};
+
             if (search) cleanParams.search = search;
             if (filters.department_id) cleanParams.department_id = filters.department_id;
-            if (filters.is_urgent) cleanParams.is_urgent = filters.is_urgent;
-            if (filters.date) cleanParams.date = filters.date;
+            if (filters.is_urgent !== '') {
+                cleanParams.is_urgent = filters.is_urgent === 'true';
+            }
 
             const { data } = await api.get('/notices', { params: cleanParams });
             setNotices(data);
@@ -46,15 +47,42 @@ const NoticeBoard = () => {
         }
     };
 
-    const getPriorityColor = (isUrgent) => {
-        return isUrgent ? '#ff4757' : '#2ed573';
+    const getPriorityColor = (isUrgent) =>
+        isUrgent ? '#ff4757' : '#2ed573';
+
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-IN', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric'
+        });
     };
 
     return (
         <div>
-            <div className="glass-panel" style={{ padding: '20px', marginBottom: '30px', display: 'flex', gap: '15px', flexWrap: 'wrap', alignItems: 'center' }}>
+            {/* Search & Filter */}
+            <div
+                className="glass-panel"
+                style={{
+                    padding: '20px',
+                    marginBottom: '30px',
+                    display: 'flex',
+                    gap: '15px',
+                    flexWrap: 'wrap',
+                    alignItems: 'center'
+                }}
+            >
                 <div style={{ flex: 1, position: 'relative' }}>
-                    <Search style={{ position: 'absolute', left: '10px', top: '10px', color: 'rgba(255,255,255,0.7)' }} size={20} />
+                    <Search
+                        size={20}
+                        style={{
+                            position: 'absolute',
+                            left: '10px',
+                            top: '10px',
+                            color: 'rgba(255,255,255,0.7)'
+                        }}
+                    />
                     <input
                         type="text"
                         placeholder="Search notices..."
@@ -66,52 +94,97 @@ const NoticeBoard = () => {
 
                 <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
                     <Filter size={18} />
+
                     <select
                         value={filters.department_id}
-                        onChange={(e) => setFilters({ ...filters, department_id: e.target.value })}
+                        onChange={(e) =>
+                            setFilters({ ...filters, department_id: e.target.value })
+                        }
                         style={{ margin: 0, width: '150px' }}
                     >
-                        <option value="" style={{ color: 'black' }}>All Departments</option>
-                        {departments.map(d => (
-                            <option key={d.id} value={d.id} style={{ color: 'black' }}>{d.name}</option>
+                        <option value="" style={{ color: 'black' }}>
+                            All Departments
+                        </option>
+                        {departments.map((d) => (
+                            <option key={d.id} value={d.id} style={{ color: 'black' }}>
+                                {d.name}
+                            </option>
                         ))}
                     </select>
 
                     <select
                         value={filters.is_urgent}
-                        onChange={(e) => setFilters({ ...filters, is_urgent: e.target.value })}
+                        onChange={(e) =>
+                            setFilters({ ...filters, is_urgent: e.target.value })
+                        }
                         style={{ margin: 0, width: '120px' }}
                     >
-                        <option value="" style={{ color: 'black' }}>All Priorities</option>
-                        <option value="true" style={{ color: 'black' }}>Urgent</option>
-                        <option value="false" style={{ color: 'black' }}>Normal</option>
+                        <option value="" style={{ color: 'black' }}>
+                            All Priorities
+                        </option>
+                        <option value="true" style={{ color: 'black' }}>
+                            Urgent
+                        </option>
+                        <option value="false" style={{ color: 'black' }}>
+                            Normal
+                        </option>
                     </select>
-
-
                 </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px' }}>
-                {notices.map(notice => (
-                    <div key={notice.id} className="glass-panel" style={{ padding: '20px', display: 'flex', flexDirection: 'column' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '10px' }}>
-                            <span style={{
+            {/* Notices */}
+            <div
+                style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+                    gap: '20px'
+                }}
+            >
+                {notices.map((notice) => (
+                    <div
+                        key={notice.id}
+                        className="glass-panel"
+                        style={{
+                            padding: '20px',
+                            display: 'flex',
+                            flexDirection: 'column'
+                        }}
+                    >
+                        <span
+                            style={{
                                 background: getPriorityColor(notice.is_urgent),
                                 padding: '2px 8px',
                                 borderRadius: '4px',
                                 fontSize: '0.7em',
-                                fontWeight: 'bold'
-                            }}>
-                                {notice.is_urgent ? 'URGENT' : 'NORMAL'}
-                            </span>
+                                fontWeight: 'bold',
+                                color: '#fff',
+                                width: 'fit-content'
+                            }}
+                        >
+                            {notice.is_urgent ? 'URGENT' : 'NORMAL'}
+                        </span>
 
-                        </div>
-                        <h3 style={{ margin: '0 0 10px 0' }}>{notice.title}</h3>
-                        <p style={{ flex: 1, opacity: 0.9, whiteSpace: 'pre-wrap' }}>{notice.content}</p>
+                        <h3 style={{ margin: '10px 0' }}>{notice.title}</h3>
 
-                        <div style={{ marginTop: '15px', paddingTop: '15px', borderTop: '1px solid rgba(255,255,255,0.1)', fontSize: '0.8em', display: 'flex', justifyContent: 'space-between' }}>
-                            <span>Dept: {notice.Department?.name || 'General'}</span>
+                        <p style={{ flex: 1, opacity: 0.9, whiteSpace: 'pre-wrap' }}>
+                            {notice.content}
+                        </p>
+
+                        <div
+                            style={{
+                                marginTop: '15px',
+                                paddingTop: '15px',
+                                borderTop: '1px solid rgba(255,255,255,0.1)',
+                                fontSize: '0.8em',
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                flexWrap: 'wrap',
+                                gap: '6px'
+                            }}
+                        >
+                            <span>Dept: {notice.Department?.name}</span>
                             <span>By: {notice.author?.name}</span>
+                            <span>Posted: {formatDate(notice.createdAt)}</span>
                         </div>
                     </div>
                 ))}

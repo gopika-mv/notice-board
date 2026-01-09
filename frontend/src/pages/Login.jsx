@@ -5,7 +5,13 @@ import api from '../api';
 const Login = () => {
     const { login } = useAuth();
     const [isRegister, setIsRegister] = useState(false);
-    const [formData, setFormData] = useState({ name: '', username: '', password: '', role: 'student', department_id: '' }); // added name
+    const [formData, setFormData] = useState({
+        name: '',
+        username: '',
+        password: '',
+        role: 'student',
+        department_id: ''
+    });
     const [error, setError] = useState('');
     const [departments, setDepartments] = useState([]);
 
@@ -29,10 +35,11 @@ const Login = () => {
         setError('');
         try {
             if (isRegister) {
-                const response = await api.post('/auth/register', formData);
-                const message = formData.role === 'staff'
-                    ? 'Registration successful! Waiting for admin approval.'
-                    : 'Registration successful! Please login.';
+                await api.post('/auth/register', formData);
+                const message =
+                    formData.role === 'staff'
+                        ? 'Registration successful! Waiting for admin approval.'
+                        : 'Registration successful! Please login.';
                 alert(message);
                 setIsRegister(false);
             } else {
@@ -46,8 +53,29 @@ const Login = () => {
     return (
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '80vh' }}>
             <div className="glass-panel" style={{ padding: '40px', width: '350px', textAlign: 'center' }}>
-                <h1 style={{ marginBottom: '20px' }}>{isRegister ? 'Register' : 'Login'}</h1>
-                {error && <div style={{ background: 'rgba(255,0,0,0.2)', padding: '10px', borderRadius: '5px', marginBottom: '10px' }}>{error}</div>}
+
+                {/* CampusConnect Login Title */}
+                <h1 style={{ marginBottom: '5px', fontWeight: 'bold' }}>
+                    CampusConnect<br />
+                    {isRegister ? 'Register' : 'Login'}
+                </h1>
+
+                <p style={{ marginBottom: '20px', opacity: 0.7 }}>
+                    College Notice Board
+                </p>
+
+                {error && (
+                    <div
+                        style={{
+                            background: 'rgba(255,0,0,0.2)',
+                            padding: '10px',
+                            borderRadius: '5px',
+                            marginBottom: '10px'
+                        }}
+                    >
+                        {error}
+                    </div>
+                )}
 
                 <form onSubmit={handleSubmit}>
                     {isRegister && (
@@ -55,22 +83,30 @@ const Login = () => {
                             type="text"
                             placeholder="Full Name"
                             value={formData.name}
-                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                            onChange={(e) =>
+                                setFormData({ ...formData, name: e.target.value })
+                            }
                             required
                         />
                     )}
+
                     <input
                         type="text"
                         placeholder="Username"
                         value={formData.username}
-                        onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                        onChange={(e) =>
+                            setFormData({ ...formData, username: e.target.value })
+                        }
                         required
                     />
+
                     <input
                         type="password"
                         placeholder="Password"
                         value={formData.password}
-                        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                        onChange={(e) =>
+                            setFormData({ ...formData, password: e.target.value })
+                        }
                         required
                     />
 
@@ -78,35 +114,65 @@ const Login = () => {
                         <>
                             <select
                                 value={formData.role}
-                                onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                                onChange={(e) =>
+                                    setFormData({ ...formData, role: e.target.value })
+                                }
                             >
-                                <option value="student" style={{ color: 'black' }}>Student</option>
-                                <option value="staff" style={{ color: 'black' }}>Staff</option>
+                                <option value="student" style={{ color: 'black' }}>
+                                    Student
+                                </option>
+                                <option value="staff" style={{ color: 'black' }}>
+                                    Staff
+                                </option>
                             </select>
-                            {(formData.role === 'staff' || formData.role === 'student') && (
-                                <select
-                                    value={formData.department_id}
-                                    onChange={(e) => setFormData({ ...formData, department_id: e.target.value })}
-                                    required
-                                >
-                                    <option value="" style={{ color: 'black' }}>Select Department</option>
-                                    {departments.map(dept => (
-                                        <option key={dept.id} value={dept.id} style={{ color: 'black' }}>
-                                            {dept.name}
-                                        </option>
-                                    ))}
-                                </select>
-                            )}
+
+                            <select
+                                value={formData.department_id}
+                                onChange={(e) =>
+                                    setFormData({
+                                        ...formData,
+                                        department_id: e.target.value
+                                    })
+                                }
+                                required
+                            >
+                                <option value="" style={{ color: 'black' }}>
+                                    Select Department
+                                </option>
+                                {departments.map((dept) => (
+                                    <option
+                                        key={dept.id}
+                                        value={dept.id}
+                                        style={{ color: 'black' }}
+                                    >
+                                        {dept.name}
+                                    </option>
+                                ))}
+                            </select>
                         </>
                     )}
 
-                    <button type="submit" className="btn btn-primary" style={{ width: '100%', marginTop: '10px' }}>
+                    <button
+                        type="submit"
+                        className="btn btn-primary"
+                        style={{ width: '100%', marginTop: '10px' }}
+                    >
                         {isRegister ? 'Sign Up' : 'Sign In'}
                     </button>
                 </form>
 
-                <p style={{ marginTop: '20px', fontSize: '0.9em', cursor: 'pointer', textDecoration: 'underline' }} onClick={() => setIsRegister(!isRegister)}>
-                    {isRegister ? 'Already have an account? Login' : 'Need an account? Register'}
+                <p
+                    style={{
+                        marginTop: '20px',
+                        fontSize: '0.9em',
+                        cursor: 'pointer',
+                        textDecoration: 'underline'
+                    }}
+                    onClick={() => setIsRegister(!isRegister)}
+                >
+                    {isRegister
+                        ? 'Already have an account? CampusConnect Login'
+                        : 'Need an account? CampusConnect Register'}
                 </p>
             </div>
         </div>
